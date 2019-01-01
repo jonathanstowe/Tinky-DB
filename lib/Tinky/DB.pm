@@ -1,16 +1,17 @@
 use v6;
 
+use Tinky;
+use Red;
 
 module Tinky::DB {
 
-    use Tinky;
-    use Red;
+    # use Tinky;
 
     model Workflow is Tinky::Workflow  {
         has Int $.id            is serial;
         has Str $.name          is column(:unique);
         has     @.states        is relationship({ .workflow-id }, model => 'State' );
-        has     @.transitions   is relationship({ .workflow-id }. model => 'Transition' );
+        has     @.transitions   is relationship({ .workflow-id }, model => 'Transition' );
     }
 
     model State is Tinky::State {
@@ -31,7 +32,6 @@ module Tinky::DB {
         has     $.to            is relationship({  .to-id }, model => 'State' );
 
     }
-
 }
 
 # vim: ft=perl6

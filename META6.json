@@ -1,0 +1,39 @@
+{
+  "version": "0.0.1",
+  "meta-version": "0",
+  "name": "Tinky::DB",
+  "support": {
+    "source": "git://github.com/jonathanstowe/Tinky-DB.git",
+    "email": "jns+gh@gellyfish.co.uk"
+  },
+  "perl": "6.d",
+  "tags": [
+    "workflow",
+    "tinky",
+    "database",
+    "red" 
+  ],
+  "license": "Artistic-2.0",
+  "source-url": "git://github.com/jonathanstowe/Tinky-DB.git",
+  "resources": [
+    
+  ],
+  "description": "Store Tinky Machine descriptions in a database",
+  "auth": "github:jonathanstowe",
+  "build-depends": [
+    
+  ],
+  "test-depends": [
+    
+  ],
+  "provides": {
+      "Tinky::DB": "lib/Tinky/DB.pm"
+  },
+  "depends": [
+    "Red",
+    "Tinky"
+  ],
+  "authors": [
+    "Jonathan Stowe <jns+gh@gellyfish.co.uk>"
+  ]
+}
