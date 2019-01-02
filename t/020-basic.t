@@ -45,6 +45,20 @@ lives-ok {
     $es = $workflow.enter-supply;
 }, "get enter supply";
 
+class Foo does Tinky::DB::Object {
+}
+
+$workflow = Tinky::DB::Workflow.^all.grep(*.name eq 'test_workflow').head;
+
+my $obj = Foo.new;
+
+lives-ok { $obj.apply-workflow($workflow) }, "apply workflow";
+
+ok $obj.state ~~ $state-new, "has the right state";
+
+is $obj.transitions.elems, 1, "have one transition";
+ok $obj.transitions.head ~~ $open, "have the right transition";
+
 
 
 

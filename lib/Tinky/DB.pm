@@ -36,6 +36,14 @@ module Tinky::DB {
         has Int $.to-id         is referencing(model => 'Tinky::DB::State', column => 'id', require => 'Tinky::DB');
         has     $.to            is relationship({  .to-id }, model => 'Tinky::DB::State', require => 'Tinky::DB' );
 
+        multi method ACCEPTS(Transition:D $transition --> Bool ) {
+            self.id == $transition.id
+        }
+
+    }
+
+    role Object does Tinky::Object {
+
     }
 }
 
