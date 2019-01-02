@@ -36,6 +36,9 @@ lives-ok { $complete = $workflow.transitions.create(name => "complete", from-id 
 
 is $workflow.transitions.elems, 2, "got two transitions";
 
+is $workflow.transitions-for-state($state-new).elems, 1, "transitions-for-state";
+is $workflow.transitions-for-state($state-new).head.id, $open.id, "and it's the one we expected";
+
 
 
 

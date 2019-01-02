@@ -5,6 +5,7 @@ use Red;
 
 module Tinky::DB {
 
+    model State { ... }
     model Workflow is Tinky::Workflow is table('tinky_workflow') is rw {
         has Int $.id                is serial;
         has Str $.name              is column(:unique);
@@ -12,6 +13,10 @@ module Tinky::DB {
         has     $.initial-state     is relationship({ .initial-state-id }, model => 'Tinky::DB::State', require => 'Tinky::DB');
         has     @.states            is relationship({ .workflow-id }, model => 'Tinky::DB::State', require => 'Tinky::DB' );
         has     @.transitions       is relationship({ .workflow-id }, model => 'Tinky::DB::Transition', require => 'Tinky::DB' );
+
+        method transitions-for-state(State:D $state ) {
+            self.transitions.grep(*.from-id == $state.id);
+        }
     }
 
     model State is Tinky::State is table('tinky_state') is rw {
