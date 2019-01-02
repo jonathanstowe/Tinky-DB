@@ -39,6 +39,11 @@ is $workflow.transitions.elems, 2, "got two transitions";
 is $workflow.transitions-for-state($state-new).elems, 1, "transitions-for-state";
 is $workflow.transitions-for-state($state-new).head.id, $open.id, "and it's the one we expected";
 
+my $es;
+
+lives-ok {
+    $es = $workflow.enter-supply;
+}, "get enter supply";
 
 
 
