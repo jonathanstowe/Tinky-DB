@@ -39,8 +39,14 @@ is $workflow.transitions.elems, 2, "got two transitions";
 is $workflow.transitions-for-state($state-new).elems, 1, "transitions-for-state";
 is $workflow.transitions-for-state($state-new).head.id, $open.id, "and it's the one we expected";
 
+todo "precomp issue with what find-transition does";
+lives-ok {
+    ok $workflow.find-transition($state-new, $state-open) ~~ $open, "find-transition";
+}, "find-transition";
+
 my $es;
 
+todo 'needs a change in Tinky';
 lives-ok {
     $es = $workflow.enter-supply;
 }, "get enter supply";
@@ -58,6 +64,14 @@ ok $obj.state ~~ $state-new, "has the right state";
 
 is $obj.transitions.elems, 1, "have one transition";
 ok $obj.transitions.head ~~ $open, "have the right transition";
+is $obj.next-states.elems, 1, "next-states also has one state";
+ok $obj.next-states.head ~~ $state-open, "and it's the right state";
+
+todo "find-transition exposes a precomp issue";
+
+lives-ok {
+    ok $obj.transition-for-state($state-open) ~~ $open, "transition-for-state returns the right thing";
+}, "transition-for-state";
 
 
 
