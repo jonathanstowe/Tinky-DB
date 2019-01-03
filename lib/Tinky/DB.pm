@@ -19,18 +19,20 @@ module Tinky::DB {
         }
     }
 
-    model State is Tinky::State is table('tinky_state') is rw {
-        has Int $.id            is serial;
-        has Str $.name          is column;
+    role WithWorkflow {
         has Int $.workflow-id   is referencing(model => 'Tinky::DB::Workflow', column => 'id', require => 'Tinky::DB');
         has     $.workflow      is relationship({ .workflow-id }, model => 'Tinky::DB::Workflow', require => 'Tinky::DB');
+
     }
 
-    model Transition is Tinky::Transition is table('tinky_transition') is rw {
+    model State is Tinky::State is table('tinky_state') does WithWorkflow is rw {
         has Int $.id            is serial;
         has Str $.name          is column;
-        has Int $.workflow-id   is referencing(model => 'Tinky::DB::Workflow', column => 'id', require => 'Tinky::DB');
-        has     $.workflow      is relationship({ .workflow-id }, model => 'Tinky::DB::Workflow', require => 'Tinky::DB');
+    }
+
+    model Transition is Tinky::Transition is table('tinky_transition') does WithWorkflow is rw {
+        has Int $.id            is serial;
+        has Str $.name          is column;
         has Int $.from-id       is referencing(model => 'Tinky::DB::State', column => 'id', require => 'Tinky::DB');
         has     $.from          is relationship({  .from-id }, model => 'Tinky::DB::State', require => 'Tinky::DB' );
         has Int $.to-id         is referencing(model => 'Tinky::DB::State', column => 'id', require => 'Tinky::DB');
