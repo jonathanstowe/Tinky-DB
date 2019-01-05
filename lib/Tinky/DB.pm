@@ -17,6 +17,11 @@ module Tinky::DB {
         method transitions-for-state(State:D $state ) {
             self.transitions.grep(*.from-id == $state.id);
         }
+
+        multi method find-transition(State:D $from, State:D $to) {
+            self.transitions-for-state($from).first( { $_.to-id == $to.id });
+        }
+
     }
 
     model State is Tinky::State is table('tinky_state') is rw {
