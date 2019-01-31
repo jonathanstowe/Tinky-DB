@@ -63,6 +63,7 @@ ok $obj.state ~~ $state-new, "has the right state";
 
 is $obj.transitions.elems, 1, "have one transition";
 ok $obj.transitions.head ~~ $open, "have the right transition";
+
 is $obj.next-states.elems, 1, "next-states also has one state";
 ok $obj.next-states.head ~~ $state-open, "and it's the right state";
 
