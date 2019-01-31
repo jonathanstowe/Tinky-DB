@@ -29,6 +29,10 @@ module Tinky::DB {
         has Str $.name          is column;
         has Int $.workflow-id   is referencing(model => 'Tinky::DB::Workflow', column => 'id', require => 'Tinky::DB');
         has     $.workflow      is relationship({ .workflow-id }, model => 'Tinky::DB::Workflow', require => 'Tinky::DB');
+
+        multi method ACCEPTS(State:D $state --> Bool ) {
+            self.id == $state.id
+        }
     }
 
     model Transition is Tinky::Transition is table('tinky_transition') is rw {
