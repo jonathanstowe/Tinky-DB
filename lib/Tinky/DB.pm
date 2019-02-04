@@ -6,6 +6,10 @@ use Red;
 module Tinky::DB {
 
     model State { ... }
+
+    role Object does Tinky::Object {
+    }
+
     model Workflow is Tinky::Workflow is table('tinky_workflow') is rw {
         has Int $.id                is serial;
         has Str $.name              is column(:unique);
@@ -33,6 +37,34 @@ module Tinky::DB {
         multi method ACCEPTS(State:D $state --> Bool ) {
             self.id == $state.id
         }
+
+        my Supplier $enter-supplier;
+
+        method !enter-supplier(--> Supplier ) {
+            $enter-supplier //= Supplier.new;
+        }
+
+        method enter-supply( --> Supply ) {
+            self!enter-supplier.Supply.grep( -> $ ( $s, $o ) { $s.id == self.id } ).map( -> $ ($, $o) { $o } );
+        }
+
+        method enter(Object:D $object) {
+            self!enter-supplier.emit([self, $object]);
+        }
+
+        my Supplier $leave-supplier;
+
+        method !leave-supplier( --> Supplier ) {
+            $leave-supplier //= Supplier.new;
+        }
+
+        method leave-supply( --> Supply ) {
+            self!leave-supplier.Supply.grep( -> $ ( $s, $o ) { $s.id == self.id } ).map( -> $ ($, $o) { $o } );
+        }
+
+        method leave(Object:D $object) {
+            self!leave-supplier.emit([self, $object]);
+        }
     }
 
     model Transition is Tinky::Transition is table('tinky_transition') is rw {
@@ -49,11 +81,23 @@ module Tinky::DB {
             self.id == $transition.id
         }
 
+        my Supplier $supplier;
+
+        method !supplier( --> Supplier ) {
+            $supplier //= Supplier.new;
+        }
+
+        method supply( --> Supply ) {
+            self!supplier.Supply.grep( -> $ ( $t, $o ) { $t.id == self.id } ).map( -> $ ($, $o) { $o } );
+        }
+
+        method applied(Object:D $object) {
+            self.from.leave($object);
+            self.to.enter($object);
+            self!supplier.emit([ self, $object ]);
+        }
     }
 
-    role Object does Tinky::Object {
-
-    }
 }
 
 # vim: ft=perl6

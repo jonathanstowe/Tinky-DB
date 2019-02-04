@@ -61,7 +61,10 @@ lives-ok {
 
     my Bool $seen-final = False;
 
-    $workflow.final-supply.act(-> ( $state, $object) { $seen-final = True });
+    $workflow.enter-supply.act( -> ( $state, $object ) { diag "enter " ~ $state});
+
+    $workflow.final-supply.act(-> ( $state, $object) { diag "final with " ~ $state; $seen-final = True });
+
 
     my $ticket-a = Ticket.new(owner => "Operator A");
 
@@ -85,7 +88,9 @@ lives-ok {
 
     is $ticket-a.state, $state-rejected, "Rejected";
 
-    todo "different objects",4;
+    diag $workflow.transitions-for-state($state-rejected).Seq.elems == 0;
+    diag $workflow.transitions-for-state($state-open).Seq.elems == 0;
+
     is $transition-count, 4, "saw the right number of transitions";
     ok $seen-transition-supply, "saw the event on stall transition";
     ok $seen-entered, "Saw an event on the entered supply";
