@@ -5,7 +5,8 @@ use v6;
 use Test;
 
 use Tinky::DB;
-use Red; # for database
+use Red::Database;
+use Red::Operators;
 
 my $*RED-DEBUG          = $_ with %*ENV<RED_DEBUG>;
 my $*RED-DEBUG-RESPONSE = $_ with %*ENV<RED_DEBUG_RESPONSE>;

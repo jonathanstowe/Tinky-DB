@@ -3,7 +3,8 @@
 use Test;
 
 use Tinky::DB;
-use Red;
+use Red::Database;
+use Red::Operators;
 
 # This is basically the synopsis code instrumented to
 # function as a test
