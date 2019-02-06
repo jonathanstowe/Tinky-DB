@@ -38,12 +38,12 @@ lives-ok {
     my Bool $seen-entered = False;
     $state-rejected.enter-supply.act( -> $object { $seen-entered = True });
 
-    my $open              = $workflow.transitions.create(name => 'open', from-id => $state-new.id, to-id => $state-open.id);
-    my $reject-new        = $workflow.transitions.create(name => 'reject', from-id => $state-new.id, to-id => $state-rejected.id);
-    my $reject-open       = $workflow.transitions.create(name => 'reject', from-id => $state-open.id, to-id => $state-rejected.id);
-    my $reject-stalled    = $workflow.transitions.create(name => 'reject', from-id => $state-stalled.id, to-id => $state-rejected.id);
-    my $stall-open        = $workflow.transitions.create(name => 'stall', from-id => $state-open.id, to-id => $state-stalled.id);
-    my $stall-progress    = $workflow.transitions.create(name => 'stall', from-id => $state-in-progress.id, to-id => $state-stalled.id);
+    my $open              = $workflow.transitions.create(name => 'open', from => $state-new, to => $state-open);
+    my $reject-new        = $workflow.transitions.create(name => 'reject', from => $state-new, to => $state-rejected);
+    my $reject-open       = $workflow.transitions.create(name => 'reject', from => $state-open, to => $state-rejected);
+    my $reject-stalled    = $workflow.transitions.create(name => 'reject', from => $state-stalled, to => $state-rejected);
+    my $stall-open        = $workflow.transitions.create(name => 'stall', from => $state-open, to => $state-stalled);
+    my $stall-progress    = $workflow.transitions.create(name => 'stall', from => $state-in-progress, to => $state-stalled);
 
     my Bool $seen-transition-supply = False;
 
