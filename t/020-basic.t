@@ -50,20 +50,16 @@ lives-ok {
     $es = $workflow.enter-supply;
 }, "get enter supply";
 
-diag "before class";
 
 class Foo does Tinky::DB::Object {
 }
 
-diag "after class";
 
 $workflow = Tinky::DB::Workflow.^all.grep(*.name eq 'test_workflow').head;
 
-diag "got wf";
 
 my $obj = Foo.new;
 
-diag "new obj";
 
 lives-ok { $obj.apply-workflow($workflow) }, "apply workflow";
 
