@@ -7,7 +7,7 @@ module Tinky::DB {
 
     model State { ... }
 
-    role Object does Tinky::Object {
+    role Object does Tinky::Object is export {
     }
 
     model Workflow is Tinky::Workflow is table('tinky_workflow') is rw {
