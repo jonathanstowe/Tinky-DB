@@ -12,6 +12,7 @@ use Red::Operators;
 lives-ok {
     my $*RED-DEBUG          = $_ with %*ENV<RED_DEBUG>;
     my $*RED-DB             = database "SQLite", |(:database($_) with %*ENV<RED_DATABASE>);
+    my $*RED-COMMENT-SQL = True;
 
     Tinky::DB::Workflow.^create-table;
     Tinky::DB::State.^create-table;
@@ -79,7 +80,7 @@ lives-ok {
 
     is $ticket-a.state, $state-in-progress, "In progress";
 
-    #is-deeply $ticket-a.next-states, [ $state-stalled, $state-complete ], "Next-states gives what expected";
+    # is-deeply $ticket-a.next-states, [ $state-stalled, $state-complete ], "Next-states gives what expected";
 
     $ticket-a.state = $state-stalled;
 
