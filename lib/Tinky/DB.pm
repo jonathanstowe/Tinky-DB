@@ -26,6 +26,11 @@ module Tinky::DB {
             self.transitions-for-state($from).first( { $_.to-id == $to.id });
         }
 
+        method perl(--> Str) {
+            $?CLASS.^name ~ ".new( id => { $.id }, name => { $.name }, initial-state-id => { $.initial-state-id } )";
+
+        }
+
     }
 
     model State is Tinky::State is table('tinky_state') is rw {
