@@ -28,8 +28,5 @@ jobs:
     - name: Install dependencies
       run: zef install --deps-only --/test --test-depends .
 
-    - name: Build the helper
-      run: zef build .
-      
     - name: Run tests
       run: zef test -v --debug .
