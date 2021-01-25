@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: rakudo-star:latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Apt Update
+      run: apt update
+    
+    - name: Install sqlite
+      run: apt install -y libsqlite3-0
+    
+    - name: Raku version
+      run: raku -v
+
+    - name: Install dependencies
+      run: zef install --deps-only --/test --test-depends .
+
+    - name: Build the helper
+      run: zef build .
+      
+    - name: Run tests
+      run: zef test -v --debug .

@@ -8,8 +8,7 @@
 
 ## Installation
 
-Assuming you have a working Rakudo Perl 6 installation then you
-should be able to install this module with *zef* :
+Assuming you have a working Rakudo installation then you should be able to install this module with *zef* :
 
     zef install Tinky::DB
 

@@ -1,4 +1,4 @@
-#!perl6
+#!raku
 
 use v6;
 
@@ -66,4 +66,4 @@ ok $final, "and got the final event";
 is $applied, 1, "and we saw the application of the workflow";
 
 done-testing;
-# vim: expandtab shiftwidth=4 ft=perl6
+# vim: expandtab shiftwidth=4 ft=raku
