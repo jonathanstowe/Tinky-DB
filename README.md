@@ -2,9 +2,11 @@
 
 [Tinky workflows](https://github.com/jonathanstowe/Tinky) for [Red](https://github.com/FCO/Red)
 
+![Build Status](https://github.com/jonathanstowe/Tinky-DB/workflows/CI/badge.svg)
+
 ## Synopsis
 
-##Description
+## Description
 
 ## Installation
 
