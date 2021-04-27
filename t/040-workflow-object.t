@@ -7,6 +7,7 @@ use Test;
 use Tinky::DB;
 use Red::Database;
 use Red::Operators;
+use Red;
 
 my $*RED-DEBUG          = $_ with %*ENV<RED_DEBUG>;
 my $*RED-DEBUG-RESPONSE = $_ with %*ENV<RED_DEBUG_RESPONSE>;
@@ -15,15 +16,24 @@ my $*RED-DB             = database "SQLite", |(:database($_) with %*ENV<RED_DATA
 lives-ok { Tinky::DB::Workflow.^create-table }, "create workflow table";
 lives-ok { Tinky::DB::State.^create-table    }, "create state table";;
 lives-ok { Tinky::DB::Transition.^create-table }, "create transition table";
+lives-ok { Tinky::DB::Item.^create-table }, "create item table";
 
 
-my Tinky::DB::Workflow $wf = Tinky::DB::Workflow.^create(name => "test workflow");
+my Tinky::DB::Workflow $wf = Tinky::DB::Workflow.^create(name => "test-workflow");
 
 my @states = <one two three four>.map({ $wf.states.create(name => $_) });
 
 my @transitions = @states.rotor(2 => -1).map(-> ($from, $to) { my $name = $from.name ~ '-' ~ $to.name; $wf.transitions.create(:$from, :$to, :$name) });
 
-class FooTest does Tinky::DB::Object { }
+$wf.initial-state = @states[0];
+$wf.^save;
+
+model FooTest does Tinky::DB::Object {
+    has Int $.id is serial;
+    has Str $.blob is column = 'Blob';
+}
+
+FooTest.^create-table;
 
 
 is $wf.transitions.elems, @transitions.elems, "and got the right number of transitions";
@@ -38,13 +48,14 @@ for @states.rotor(2 => -1) -> ($from, $to) {
     ok $wf.find-transition($from, $to), "find-transition '{ $from.name }' -> '{ $to.name }'";
 }
 
-my $obj = FooTest.new(state => @states[0]);
-
+my $obj = FooTest.^create;
 
 throws-like { $obj.transitions }, Tinky::X::NoWorkflow, "'transitions' throws without workflow";
 throws-like { $obj.transition-for-state(@states[0]) }, Tinky::X::NoWorkflow, "'transition-for-state' throws without workflow";
 
 lives-ok { $obj.apply-workflow($wf) }, "apply workflow";
+
+ok my $item = Tinky::DB::Item.^load(workflow-id => $wf.id, object-id => $obj.id, object-class => 'FooTest'), 'get the item for the object';
 
 is $obj.transitions.elems, 1, "got one transition for current state";
 ok $obj.transition-for-state(@states[1]).defined, "and there is a transition for the next state";
@@ -60,10 +71,10 @@ for @transitions -> $trans {
     is $obj.state, $trans.to, "and it got changed to the '{ $trans.to.name }' state";
 }
 
-$obj = FooTest.new();
+$obj = FooTest.^create();
 $obj.apply-workflow($wf);
 
-for @states -> $state {
+for @states.grep( -> $s { $s.id != $obj.state.id }) -> $state {
     lives-ok { $obj.state = $state }, "set state to '{ $state.name }' by assigning to current-state";
     ok $obj.state ~~ $state , "and it is the expected state";
 }

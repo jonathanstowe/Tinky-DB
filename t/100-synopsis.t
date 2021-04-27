@@ -5,6 +5,7 @@ use Test;
 use Tinky::DB;
 use Red::Database;
 use Red::Operators;
+use Red;
 
 # This is basically the synopsis code instrumented to
 # function as a test
@@ -17,12 +18,16 @@ lives-ok {
     Tinky::DB::Workflow.^create-table;
     Tinky::DB::State.^create-table;
     Tinky::DB::Transition.^create-table;
+    Tinky::DB::Item.^create-table;
 
 
-    class Ticket does Tinky::DB::Object {
-        has Str $.ticket-number = (^100000).pick.fmt("%08d");
-        has Str $.owner;
+    model Ticket does Tinky::DB::Object {
+        has Int $.id is serial;
+        has Str $.ticket-number is unique = (^100000).pick.fmt("%08d");
+        has Str $.owner is column;
     }
+
+    Ticket.^create-table;
 
     my $workflow = Tinky::DB::Workflow.^create(name => 'ticket-workflow');
 
@@ -66,7 +71,7 @@ lives-ok {
     $workflow.final-supply.act(-> ( $state, $object) { $seen-final = True });
 
 
-    my $ticket-a = Ticket.new(owner => "Operator A");
+    my $ticket-a = Ticket.^create(owner => "Operator A");
 
     $ticket-a.apply-workflow($workflow);
 

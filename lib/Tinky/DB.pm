@@ -1,7 +1,7 @@
 use v6;
 
 use Tinky :ALL;
-use Red;
+use Red:api<2>;
 
 module Tinky::DB {
 
@@ -14,8 +14,39 @@ module Tinky::DB {
     }
 
     model State { ... }
+    model Item  { ... }
+    model Workflow { ... }
+    model Transition { ... }
+
 
     role Object does Tinky::Object is export {
+        method id() { ... }
+
+        has Item $.workflow-item;
+
+        method populate-item(Workflow:D $workflow --> Nil) is before-apply-workflow {
+            if Tinky::DB::Item.^load( workflow-id => $workflow.id, object-id => self.id , object-class => self.^name ) -> $item {
+                if $item.state-id.defined  && !self.state.defined {
+                    self.state = $item.state;
+                }
+                $!workflow-item = $item;
+            }
+            else {
+                $!workflow-item = Item.^create(workflow-id => $workflow.id, object-id => self.id, object-class => self.^name);
+            }
+        }
+
+        method save-initial-state(Workflow:D $workflow --> Nil ) is after-apply-workflow {
+            if self.state.defined && !$!workflow-item.state.defined {
+                $!workflow-item.state-id = self.state.id;
+                $!workflow-item.^save;
+            }
+        }
+
+        method save-state(Transition:D $transition --> Nil ) is after-apply-transition {
+            $!workflow-item.state-id = self.state.id;
+            $!workflow-item.^save;
+        }
     }
 
     role Helper {
@@ -152,6 +183,21 @@ module Tinky::DB {
             Promise.allof(@promises).then( { so all(@promises.map(-> $p { $p.result })) });
         }
 
+    }
+
+    model Item is table('tinky_item') {
+        has Int         $.id            is serial;
+        has Int         $.workflow-id   is referencing(model => 'Tinky::DB::Workflow', column => 'id', require => 'Tinky::DB') is unique<unq-workflow-object>;
+        has             $.workflow      is relationship(*.workflow-id, model => 'Tinky::DB::Workflow', require => 'Tinky::DB', :no-prefetch);
+        has Int         $.state-id      is referencing(model => 'Tinky::DB::State', column => 'id', require => 'Tinky::DB') is column(:nullable) is rw;
+        has             $.state         is relationship(*.state-id, model => 'Tinky::DB::State', require => 'Tinky::DB', :no-prefetch) is rw;
+        has Int         $.object-id     is column is unique<unq-workflow-object>;
+        has Str         $.object-class  is column is unique<unq-workflow-object>;
+        has DateTime    $.last-updated  is column is rw = DateTime.now;
+
+        method set-last-updated() is before-update {
+            $!last-updated = DateTime.now;
+        }
     }
 }
 

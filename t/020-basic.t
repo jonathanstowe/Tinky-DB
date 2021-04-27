@@ -7,6 +7,7 @@ use Test;
 use Tinky::DB;
 use Red::Database; # for database
 use Red::Operators;
+use Red;
 
 my $*RED-DEBUG          = $_ with %*ENV<RED_DEBUG>;
 my $*RED-DEBUG-RESPONSE = $_ with %*ENV<RED_DEBUG_RESPONSE>;
@@ -15,6 +16,7 @@ my $*RED-DB             = database "SQLite", |(:database($_) with %*ENV<RED_DATA
 lives-ok { Tinky::DB::Workflow.^create-table }, "create workflow table";
 lives-ok { Tinky::DB::State.^create-table    }, "create state table";;
 lives-ok { Tinky::DB::Transition.^create-table }, "create transition table";
+lives-ok { Tinky::DB::Item.^create-table }, "create item table";
 
 my $workflow;
 lives-ok { $workflow = Tinky::DB::Workflow.^create: name => "test_workflow" }, "create workflow";
@@ -51,14 +53,17 @@ lives-ok {
 }, "get enter supply";
 
 
-class Foo does Tinky::DB::Object {
+model Foo does Tinky::DB::Object {
+    has Int $.id is serial;
 }
+
+Foo.^create-table;
 
 
 $workflow = Tinky::DB::Workflow.^all.grep(*.name eq 'test_workflow').head;
 
 
-my $obj = Foo.new;
+my $obj = Foo.^create;
 
 
 lives-ok { $obj.apply-workflow($workflow) }, "apply workflow";
