@@ -77,6 +77,13 @@ $obj.apply-workflow($wf);
 for @states.grep( -> $s { $s.id != $obj.state.id }) -> $state {
     lives-ok { $obj.state = $state }, "set state to '{ $state.name }' by assigning to current-state";
     ok $obj.state ~~ $state , "and it is the expected state";
+    ok my $item = Tinky::DB::Item.^load(workflow-id => $wf.id, object-id => $obj.id, object-class => 'FooTest'), 'get the item for the object';
+    is $item.state-id, $state.id, "and the item got updated";
+    ok my $saved-obj = FooTest.^load(id => $obj.id), "retrieve the object from the DB";
+    lives-ok {
+        $saved-obj.apply-workflow($wf);
+    }, "apply workflow to the retrieved object";
+    is $saved-obj.state.id, $state.id, "and the state is as expected";
 }
 
 done-testing;

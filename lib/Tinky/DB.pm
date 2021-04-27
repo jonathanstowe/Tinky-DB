@@ -189,8 +189,8 @@ module Tinky::DB {
         has Int         $.id            is serial;
         has Int         $.workflow-id   is referencing(model => 'Tinky::DB::Workflow', column => 'id', require => 'Tinky::DB') is unique<unq-workflow-object>;
         has             $.workflow      is relationship(*.workflow-id, model => 'Tinky::DB::Workflow', require => 'Tinky::DB', :no-prefetch);
-        has Int         $.state-id      is referencing(model => 'Tinky::DB::State', column => 'id', require => 'Tinky::DB') is column(:nullable) is rw;
-        has             $.state         is relationship(*.state-id, model => 'Tinky::DB::State', require => 'Tinky::DB', :no-prefetch) is rw;
+        has Int         $.state-id      is referencing(model => 'Tinky::DB::State', column => 'id', require => 'Tinky::DB') is rw;
+        has             $.state         is relationship({ .state-id } , model => 'Tinky::DB::State', require => 'Tinky::DB',:no-prefetch) is rw;
         has Int         $.object-id     is column is unique<unq-workflow-object>;
         has Str         $.object-class  is column is unique<unq-workflow-object>;
         has DateTime    $.last-updated  is column is rw = DateTime.now;
